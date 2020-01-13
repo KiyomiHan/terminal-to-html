@@ -34,7 +34,7 @@ func (i *element) asHTML() string {
 		if content == "" {
 			content = i.url
 		}
-		return fmt.Sprintf(`<a href="%s">%s</a>`, i.url, content)
+		return fmt.Sprintf(`<a onclick="window.open('%s', '_blank')">%s</a>`, i.url, content)
 	}
 
 	if i.elementType == ELEMENT_BK {
@@ -173,6 +173,10 @@ func splitAndVerifyElementSequence(s string) (arguments string, elementType int,
 	if strings.HasPrefix(s, "1339;") {
 		return s[len("1339;"):], ELEMENT_LINK, "", nil
 	}
+	if strings.HasPrefix(s, "1339;") {
+		return s[len("1339;"):], ELEMENT_LINK, "", nil
+	}
+	
 
 	prefixLen := len("1337;File=")
 	if !strings.HasPrefix(s, "1337;File=") {

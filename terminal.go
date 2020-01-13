@@ -10,12 +10,31 @@ go install github.com/buildkite/terminal-to-html/cmd/terminal-to-html
 */
 package terminal
 
-import "bytes"
+import (
+	"bytes"
+	"regexp"
+	"strings"
+	"fmt"
+)
 
 // Render converts ANSI to HTML and returns the result.
-func Render(input []byte) []byte {
+func Render(input string) []byte {
+	
+	pattern, _ := regexp.Compile(`(https|http)://(([#-~!])+)`)
+	link := "<a onclick=\"window.open('%s', '_blank')\">%s</a>"
+
+	lines := strings.Split(input, "\n")
+	urls := make([][]string,len(lines))
+
+	for line_num, line := range lines {
+		line_loc := pattern.FindAllStringIndex(line, -1)
+		for _, index := range line_loc{
+			newStr := fmt.Sprintf(link, line[index[0]: index[1]], line[index[0]: index[1]])
+			urls[line_num] = append(urls[line_num], newStr)
+		}
+	}
 	screen := screen{}
-	screen.parse(input)
-	output := bytes.Replace(screen.asHTML(), []byte("\n\n"), []byte("\n&nbsp;\n"), -1)
+	screen.parse([]byte(input))
+	output := bytes.Replace(screen.asHTML(urls), []byte("\n\n"), []byte("\n&nbsp;\n"), -1)
 	return output
 }

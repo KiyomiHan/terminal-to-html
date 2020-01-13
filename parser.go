@@ -72,30 +72,29 @@ func parseANSIToScreen(s *screen, ansi []byte) {
 	length := len(p.ansi)
 	for p.cursor = 0; p.cursor < length; {
 		char, charLen := utf8.DecodeRune(p.ansi[p.cursor:])
-
 		switch p.mode {
-		case MODE_ESCAPE:
-			// We've received an escape character but aren't inside an escape sequence yet
-			p.handleEscape(char)
-		case MODE_CONTROL:
-			// We're inside a control sequence - figure out its code and its instructions.
-			p.handleControlSequence(char)
-		case MODE_OSC:
-			// We're inside an operating system command, capture until we hit a bell character
-			p.handleOperatingSystemCommand(char)
-		case MODE_CHARSET:
-			// We're inside a charset sequence, capture the next character.
-			p.handleCharset(char)
-		case MODE_APC:
-			// We're inside a custom escape sequence
-			p.handleApplicationProgramCommand(char)
-		case MODE_NORMAL:
-			// Outside of an escape sequence entirely, normal input
-			p.handleNormal(char)
+			case MODE_ESCAPE:
+				// We've received an escape character but aren't inside an escape sequence yet
+				p.handleEscape(char)
+			case MODE_CONTROL:
+				// We're inside a control sequence - figure out its code and its instructions.
+				p.handleControlSequence(char)
+			case MODE_OSC:
+				// We're inside an operating system command, capture until we hit a bell character
+				p.handleOperatingSystemCommand(char)
+			case MODE_CHARSET:
+				// We're inside a charset sequence, capture the next character.
+				p.handleCharset(char)
+			case MODE_APC:
+				// We're inside a custom escape sequence
+				p.handleApplicationProgramCommand(char)
+			case MODE_NORMAL:
+				// Outside of an escape sequence entirely, normal input
+				p.handleNormal(char)
 		}
-
 		p.cursor += charLen
 	}
+
 }
 
 func (p *parser) handleCharset(char rune) {
